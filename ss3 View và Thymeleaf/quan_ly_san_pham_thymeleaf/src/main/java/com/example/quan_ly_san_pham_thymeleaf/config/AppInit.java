@@ -2,16 +2,15 @@ package com.example.quan_ly_san_pham_thymeleaf.config;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
-
+public class AppInit extends AbstractAnnotationConfigDispatcherServletInitializer {
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return null; // hoặc dùng cho persistence (JPA, Security...), không phải WebMvc
+        return new Class[]{com.example.quan_ly_san_pham_thymeleaf.config.AppConfiguration.class};
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{AppConfiguration.class}; // <-- sửa lại ở đây
+        return new Class[]{};
     }
 
     @Override
@@ -19,5 +18,3 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         return new String[]{"/"};
     }
 }
-
-
