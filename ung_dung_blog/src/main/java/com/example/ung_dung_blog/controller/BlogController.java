@@ -5,6 +5,10 @@ import com.example.ung_dung_blog.model.Category;
 import com.example.ung_dung_blog.service.IBlogService;
 import com.example.ung_dung_blog.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +30,17 @@ public class BlogController {
         return categoryService.findAll();
     }
     @GetMapping("")
-    public String showList(Model model){
-        model.addAttribute("blogList",blogService.findAll());
+    public String showList(@RequestParam(required = false,defaultValue = "0")int page,
+                           @RequestParam(required = false,defaultValue = "2")int size,
+                           @RequestParam(required = false,defaultValue = "")String category,
+                           @RequestParam(required = false,defaultValue = "")String tieuDe,
+                           Model model){
+        Sort sort = Sort.by(Sort.Direction.ASC,"tieuDe");
+        Pageable pageable = PageRequest.of(page,size,sort);
+        Page<Blog> blogPage = blogService.search(category,tieuDe,pageable);
+        model.addAttribute("category",category);
+        model.addAttribute("tieuDe",tieuDe);
+        model.addAttribute("blogPage",blogPage);
         return "/index";
     }
 

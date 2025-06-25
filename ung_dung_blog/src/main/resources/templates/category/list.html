@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Danh sách Thể loại</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+  <h3>Danh sách thể loại</h3>
+  <a th:href="@{/categories/create}" class="btn btn-primary mb-3">Thêm mới</a>
+
+  <div th:if="${mess}" class="alert alert-success" th:text="${mess}"></div>
+
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Tên thể loại</th>
+      <th>Thao tác</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c : ${categories}">
+      <td th:text="${c.id}"></td>
+      <td th:text="${c.name}"></td>
+      <td>
+        <a th:href="@{/categories/delete/{id}(id=${c.id})}" class="btn btn-danger btn-sm">Xoá</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <a th:href="@{/blogs}" class="btn btn-outline-secondary">Quay lại trang chủ</a>
+</div>
+</body>
+</html>

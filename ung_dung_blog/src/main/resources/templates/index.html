@@ -65,56 +65,127 @@
 </head>
 <body>
 <div class="container">
-    <div class="card p-4">
-        <h3 class="mb-4">Blog</h3>
+    <form th:action="@{/blogs}" method="get" class="container mt-4">
+        <h2 class="text-primary mb-4">📘 Blog</h2>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <a th:href="@{/blogs/create}" class="btn btn-primary">Add New Blogs</a>
-<!--            <form th:action="@{/products/search}" method="get" class="search-form d-flex">-->
-<!--                <input type="text" name="keyword" class="form-control" placeholder="Search by name..." />-->
-<!--                <button type="submit" class="btn btn-primary">Search</button>-->
-<!--            </form>-->
+        <!-- Nút + Form tìm kiếm -->
+        <div class="row align-items-end g-3 mb-4">
+            <!-- Cột nút -->
+            <div class="col-md-auto d-flex gap-2">
+                <a th:href="@{/blogs/create}" class="btn btn-success d-flex align-items-center">
+                    <i class="bi bi-plus-circle me-1"></i> Thêm Blog
+                </a>
+                <a th:href="@{/categories}" class="btn btn-outline-primary d-flex align-items-center">
+                    <i class="bi bi-folder2-open me-1"></i> Quản lý thể loại
+                </a>
+            </div>
+
+            <!-- Bộ lọc thể loại -->
+            <div class="col-md-3">
+                <label class="form-label">Lọc theo thể loại</label>
+                <select class="form-select" name="category">
+                    <option value="">-- Chọn thể loại --</option>
+                    <option th:each="cat : ${categoryList}"
+                            th:value="${cat.name}"
+                            th:text="${cat.name}"
+                            th:selected="${cat.name == category}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Tìm theo tiêu đề -->
+            <div class="col-md-4">
+                <label class="form-label">Tìm theo tiêu đề</label>
+                <input type="text" class="form-control" name="searchTitle" placeholder="Nhập tiêu đề cần tìm"
+                       th:value="${param.searchTitle}">
+            </div>
+
+            <!-- Nút tìm kiếm -->
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary mt-4">🔍 Tìm kiếm</button>
+            </div>
         </div>
+    </form>
 
-        <div class="table-responsive">
-            <table class="table table-hover" id="blogs">
-                <thead>
-                <tr>
-                    <th>Tiêu Đề</th>
-                    <th>Tóm tắt nội dung</th>
-                    <th>Thể loại</th>
-                    <th>View</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
 
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="row,rowStat : ${blogList}">
-                    <td th:text="${row.getTieuDe()}"></td>
-                    <td th:text="${row.getTomTatNoiDung()}"></td>
-                    <td th:text="${row.getCategory().getName()}"></td>
 
-                    <td>
-                        <a th:href="@{/blogs/detail/{id}(id=${row.id})}" class="btn btn-sm btn-outline-primary">Chi Tiết</a>
 
-                    </td>
-                    <td>
-                        <a th:href="@{/blogs/{id}/edit(id=${row.id})}" class="btn btn-sm btn-outline-secondary">Chỉnh sửa</a>
-                    </td>
-                    <td>
-                        <button type="button"
-                                class="btn btn-sm btn-outline-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#confirmDeleteModal"
-                                th:attr="data-id=${row.id}, data-name=${row.tieuDe}">
-                            Xoá
-                        </button>
-                    </td>
-                </tr>
+    <!--        <div class="table-responsive">-->
+<!--            <table class="table table-hover" id="blogs">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>Tiêu Đề</th>-->
+<!--                    <th>Tóm tắt nội dung</th>-->
+<!--                    <th>Thể loại</th>-->
+<!--                    <th>View</th>-->
+<!--                    <th>Edit</th>-->
+<!--                    <th>Delete</th>-->
 
-                </tbody>
-            </table>
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr th:each="row,rowStat : ${blogPage}">-->
+<!--                    <td th:text="${row.getTieuDe()}"></td>-->
+<!--                    <td th:text="${row.getTomTatNoiDung()}"></td>-->
+<!--                    <td th:text="${row.getCategory().getName()}"></td>-->
+
+<!--                    <td>-->
+<!--                        <a th:href="@{/blogs/detail/{id}(id=${row.id})}" class="btn btn-sm btn-outline-primary">Chi Tiết</a>-->
+
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <a th:href="@{/blogs/{id}/edit(id=${row.id})}" class="btn btn-sm btn-outline-secondary">Chỉnh sửa</a>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <button type="button"-->
+<!--                                class="btn btn-sm btn-outline-danger"-->
+<!--                                data-bs-toggle="modal"-->
+<!--                                data-bs-target="#confirmDeleteModal"-->
+<!--                                th:attr="data-id=${row.id}, data-name=${row.tieuDe}">-->
+<!--                            Xoá-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr th:if="${blogPage.totalPages==0}">-->
+<!--                    <td colspan="8">Danh sách trống</td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col" th:each="row : ${blogPage}">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <span>Tiêu đề: </span><span th:text="${row.tieuDe}"></span>
+                        </h5>
+
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <span>Thể loại: </span><span th:text="${row.category.name}"></span>
+                        </h6>
+
+                        <p class="card-text">
+                            <span>Tóm tắt: </span><span th:text="${row.tomTatNoiDung}"></span>
+                        </p>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a th:href="@{/blogs/detail/{id}(id=${row.id})}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                            <a th:href="@{/blogs/{id}/edit(id=${row.id})}" class="btn btn-sm btn-outline-secondary">Chỉnh sửa</a>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#confirmDeleteModal"
+                                    th:attr="data-id=${row.id}, data-name=${row.tieuDe}">
+                                Xoá
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12" th:if="${blogPage.totalPages==0}">
+                <div class="alert alert-info">Danh sách trống</div>
+            </div>
         </div>
 
         <div class="notify">
@@ -158,6 +229,16 @@
     });
 </script>
 
+<!--<div>-->
+<!--    <a th:if="${blogPage.hasPrevious()}" th:href="@{/blogs(page=${blogPage.number -1},catgory = ${category})}">Trước</a>-->
+<!--    <span th:text="${blogPage.number +1}"></span>/<span th:text="${blogPage.totalPages}"></span>-->
+<!--    <a th:if="${blogPage.hasNext()}" th:href="@{/blogs(page=${blogPage.number +1},category = ${category})}">Sau</a>-->
+<!--</div>-->
+<div class="d-flex justify-content-center align-items-center mt-4">
+    <a th:if="${blogPage.hasPrevious()}" th:href="@{/blogs(page=${blogPage.number -1},category=${category},tieuDe=${tieuDe})}" class="btn btn-outline-secondary me-2">Trước</a>
+    <span class="me-2">Trang <span th:text="${blogPage.number +1}"></span> / <span th:text="${blogPage.totalPages}"></span></span>
+    <a th:if="${blogPage.hasNext()}" th:href="@{/blogs(page=${blogPage.number +1},category=${category},tieuDe=${tieuDe})}" class="btn btn-outline-secondary">Sau</a>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
