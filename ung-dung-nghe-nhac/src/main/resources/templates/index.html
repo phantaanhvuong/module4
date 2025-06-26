@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="/layout :: head">
+    <title>List Bài Hát</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 2rem;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table th {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .btn-primary {
+            border-radius: 5px;
+            padding: 8px 20px;
+        }
+        .btn-danger {
+            border-radius: 5px;
+            padding: 8px 20px;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+        }
+        .search-form {
+            max-width: 500px;
+            margin-bottom: 1.5rem;
+        }
+        .search-form input {
+            border-radius: 5px 0 0 5px;
+        }
+        .search-form button {
+            border-radius: 0 5px 5px 0;
+        }
+        .notify {
+            margin-top: 1rem;
+        }
+        .notify .alert {
+            border-radius: 5px;
+        }
+        .action-links a {
+            margin-right: 10px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card p-4">
+        <h3 class="mb-4">Quản lý bài hát</h3>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a th:href="@{/bai_hat/create}" class="btn btn-primary">Thêm mới bài hát</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="baiHats">
+                <thead>
+                <tr>
+                    <th>Tên Bài Hát</th>
+                    <th>Nghệ Sĩ</th>
+                    <th>Thể loại</th>
+                    <th>Chỉnh sửa</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="row,rowStat : ${baiHats}">
+                    <td th:text="${row.tenBaiHat}"></td>
+                    <td th:text="${row.ngheSi}"></td>
+                    <td th:text="${row.theLoai}"></td>
+
+
+                    <td>
+                        <a th:href="@{/bai_hat/{id}/edit(id=${row.id})}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    </td>
+
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="notify">
+            <div th:if="${mess}" class="alert alert-success" role="alert">
+                <span th:text="${mess}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
