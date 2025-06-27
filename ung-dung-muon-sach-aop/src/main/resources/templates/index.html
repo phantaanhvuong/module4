@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Library</title></head>
+<body>
+<h1>Thư Viện Sách</h1>
+<ul>
+    <li th:each="book : ${bookList}">
+        <a th:href="@{'/books/' + ${book.id}}" th:text="${book.tieuDe}"></a>
+        (<span th:text="${book.soLuong}"></span> Cuốn)
+    </li>
+</ul>
+<a th:href="@{/return}">Trả Sách</a>
+</body>
+</html>
