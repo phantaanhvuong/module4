@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Cart</title>
+</head>
+<body>
+<h1>Your Cart</h1>
+
+<a href="/shop">Continue Shopping</a>
+
+<h3>Total Items: <span th:text="${cart.countItemQuantity()}"></span></h3>
+<h3>Total Products: <span th:text="${cart.countProductQuantity()}"></span></h3>
+
+<table border="1">
+  <tr>
+    <th>Item</th>
+    <th>Quantity</th>
+    <th>Price</th>
+    <th>Actions</th>
+  </tr>
+  <tr th:each="entry : ${cart.products}">
+    <td th:text="${entry.key.name}"></td>
+    <td th:text="${entry.value}"></td>
+    <td th:text="${entry.key.price}"></td>
+    <td>
+      <a th:href="@{/add/{id}(id=${entry.key.id}, action='show')}" title="Increase">+</a>
+      <a th:href="@{/decrease/{id}(id=${entry.key.id}, action='show')}" title="Decrease">−</a>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">Total Payment</td>
+    <td th:text="${cart.countTotalPayment()}"></td>
+    <td></td>
+  </tr>
+</table>
+
+<a href="/checkout">Checkout</a>
+
+</body>
+</html>
