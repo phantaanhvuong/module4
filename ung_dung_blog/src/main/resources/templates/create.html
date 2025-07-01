@@ -71,7 +71,8 @@
                 <label for="theLoai" class="form-label">Thể loại</label>
                 <select id="theLoai" class="form-control" th:field="*{category}">
                     <option th:each="c:${categoryList}"
-                    th:value="${c.id}" th:text="${c.name}"></option>
+                    th:value="${c.id}" th:text="${c.name}">
+                    </option>
                 </select>
             </div>
             <div class="form-actions">
