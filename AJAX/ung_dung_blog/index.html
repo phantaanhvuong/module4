@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog Management</title>
+  <script src="jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Quản lý Blog</h1>
+
+<div>
+  <input id="title" placeholder="Tiêu đề"><br>
+  <textarea id="summary" placeholder="Tóm tắt nội dung"></textarea><br>
+  <textarea id="detail" placeholder="Nội dung chi tiết"></textarea><br>
+
+  <select id="categoryId">
+    <option value="1">Cuộc sống </option>
+    <option value="2">Du lịch</option>
+    <option value="3">lập trình</option>
+  </select><br>
+  <button id="btn-save">Lưu</button>
+</div>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>STT</th>
+    <th>ID</th>
+    <th>Tiêu đề</th>
+    <th>Nội dung</th>
+    <th>Thể loại</th>
+  </tr>
+  </thead>
+  <tbody id="blog-content"></tbody>
+</table>
+
+<button id="btn-more">Xem thêm</button>
+
+<script>
+  $(document).ready(function () {
+    let page = 0;
+    display(0);
+
+    $('#btn-save').click(function () {
+      const blog = {
+        tieuDe: $('#title').val(),
+        tomTatNoiDung: $('#content').val(),
+        noiDungChiTiet: $('#content').val(),
+        category: {
+          id: $('#categoryId').val()
+        }
+      };
+
+
+      $.ajax({
+        url: 'http://localhost:8080/api/v1/blogs',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(blog),
+        complete: function () {
+          page = 0;
+          $('#blog-content').html('');
+          display(page);
+        },
+        error: function (res) {
+          console.log("------Lỗi------");
+          console.log(res.status);
+        }
+      });
+    });
+
+    $('#btn-more').click(function () {
+      page++;
+      display(page);
+    });
+
+    function display(pageNumber) {
+      $.ajax({
+        url: `http://localhost:8080/api/v1/blogs/load?page=${pageNumber}&size=3`,
+        method: 'GET',
+        success: function (data) {
+          let html = '';
+          console.log(data);
+          for (let i = 0; i < data.length; i++) {
+            html += `
+              <tr>
+                  <td>${(pageNumber * 3) + i + 1}</td>
+                  <td>${data[i].id}</td>
+                  <td>${data[i].tieuDe}</td>
+                  <td>${data[i].tomTatNoiDung}</td>
+                  <td>${data[i].category.name}</td>
+              </tr>`;
+          }
+          $('#blog-content').append(html);
+        },
+        error: function (xhr) {
+          console.log("Lỗi khi load dữ liệu:");
+          console.log(xhr.status);
+          console.log(xhr.responseText);
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
