@@ -1,106 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Blog Management</title>
-  <script src="jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Blog Management</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 <body>
 <h1>Quản lý Blog</h1>
 
 <div>
-  <input id="title" placeholder="Tiêu đề"><br>
-  <textarea id="summary" placeholder="Tóm tắt nội dung"></textarea><br>
-  <textarea id="detail" placeholder="Nội dung chi tiết"></textarea><br>
+    <input id="tieuDe" placeholder="Tiêu đề"><br>
+    <textarea id="tomTatNoiDung" placeholder="Tóm tắt nội dung"></textarea><br>
+    <textarea id="noiDungChiTiet" placeholder="Nội dung chi tiết"></textarea><br>
 
-  <select id="categoryId">
-    <option value="1">Cuộc sống </option>
-    <option value="2">Du lịch</option>
-    <option value="3">lập trình</option>
-  </select><br>
-  <button id="btn-save">Lưu</button>
+    <select id="categoryId">
+        <option value="1">Cuộc sống</option>
+        <option value="2">Du lịch</option>
+        <option value="3">lập trình</option>
+    </select><br>
+    <button id="btn-save">Lưu</button>
 </div>
 
 <table border="1">
-  <thead>
-  <tr>
-    <th>STT</th>
-    <th>ID</th>
-    <th>Tiêu đề</th>
-    <th>Nội dung</th>
-    <th>Thể loại</th>
-  </tr>
-  </thead>
-  <tbody id="blog-content"></tbody>
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>ID</th>
+        <th>Tiêu đề</th>
+        <th>Nội dung</th>
+        <th>Thể loại</th>
+    </tr>
+    </thead>
+    <tbody id="blog-content"></tbody>
 </table>
 
 <button id="btn-more">Xem thêm</button>
 
 <script>
-  $(document).ready(function () {
+    // $(document).ready(function () {
+    //   let page = 0;
+    //   display(0);
+    //
+    //   $('#btn-save').click(function () {
+    //     const blog = {
+    //       tieuDe: $('#tieuDe').val(),
+    //       tomTatNoiDung: $('#tomTatNoiDung').val(),
+    //       noiDungChiTiet: $('#noiDungChiTiet').val(),
+    //       category: {
+    //         id: $('#categoryId').val()
+    //       }
+    //     };
+    //     const id = $('#btn-save').data('edit-id');
+    //     const url = id
+    //       ? `http://localhost:8080/api/v1/blogs/${id}`
+    //       : 'http://localhost:8080/api/v1/blogs';
+    //     const method = id ? 'PATCH':'POST';
+    //
+    //
+    //     $.ajax({
+    //       url: url,
+    //       method: method,
+    //       contentType: 'application/json',
+    //       data: JSON.stringify(blog),
+    //       success: function () {
+    //         $('#blog-content').html('');
+    //         display(0);
+    //         $('#tieuDe').val('');
+    //         $('#tomTatNoiDung').val('');
+    //         $('#noiDungChiTiet').val('');
+    //         $('#categoryId').val('1');
+    //         $('#btn-save').removeData('edit-id');
+    //       },
+    //       error: function () {
+    //         alert("Lỗi khi lưu blog.");
+    //       }
+    //     });
+    //   });
+    //
+    //   $('#btn-more').click(function () {
+    //     page++;
+    //     display(page);
+    //   });
+    //
+    //   function display(pageNumber) {
+    //     $.ajax({
+    //       url: `http://localhost:8080/api/v1/blogs/load?page=${pageNumber}&size=3`,
+    //       method: 'GET',
+    //       success: function (data) {
+    //         let html = '';
+    //         console.log(data);
+    //         for (let i = 0; i < data.length; i++) {
+    //           html += `
+    //             <tr>
+    //                 <td>${(pageNumber * 3) + i + 1}</td>
+    //                 <td>${data[i].id}</td>
+    //                 <td>${data[i].tieuDe}</td>
+    //                 <td>${data[i].tomTatNoiDung}</td>
+    //                 <td>${data[i].category.name}</td>
+    //                 <td>
+    //                 <button class="btn-edit" data-id="${data[i].id}">Sửa</button>
+    //                 </td>
+    //                 <td>
+    //                 <button class="btn-delete" data-id="${data[i].id}">Xoá</button>
+    //                 </td>
+    //             </tr>`;
+    //         }
+    //         $('#blog-content').append(html);
+    //       },
+    //       error: function (xhr) {
+    //         console.log("Lỗi khi load dữ liệu:");
+    //         console.log(xhr.status);
+    //         console.log(xhr.responseText);
+    //       }
+    //     });
+    //   }
+    // });
+    // $(document).on('click','.btn-delete',function (){
+    //   let page = 0;
+    //   const id = $(this).data('id');
+    //   if (confirm("Bạn có chắc muốn xoá?")){
+    //     $.ajax({
+    //       url: `http://localhost:8080/api/v1/blogs/${id}`,
+    //       method: 'DELETE',
+    //       success: function () {
+    //         $('#blog-content').html('');
+    //         $.get(`http://localhost:8080/api/v1/blogs/load?page=${page}&size=3`, function (data) {
+    //           if (data.length === 0 && page > 0) {
+    //             page--;
+    //           }
+    //           display(page);
+    //         });
+    //       },
+    //       error: function () {
+    //         alert("Lỗi khi xoá blog");
+    //       }
+    //     });
+    //   }
+    // })
+    // $(document).on('click','.btn-edit', function (){
+    //   const id = $(this).data('id');
+    //   $.ajax({
+    //     url: `http://localhost:8080/api/v1/blogs/${id}`,
+    //     method: 'GET',
+    //     success: function (data){
+    //       $('#tieuDe').val(data.tieuDe);
+    //       $('#tomTatNoiDung').val(data.tomTatNoiDung);
+    //       $('#noiDungChiTiet').val(data.noiDungChiTiet);
+    //       $('#categoryId').val(data.category.id);
+    //       $('#btn-save').data('edit-id',data.id)
+    //     },
+    //     error: function (){
+    //       alert("Không tìm thấy blog")
+    //     }
+    //   })
+    // })
+
+    // hiển thị list phân trang
     let page = 0;
-    display(0);
-
-    $('#btn-save').click(function () {
-      const blog = {
-        tieuDe: $('#title').val(),
-        tomTatNoiDung: $('#content').val(),
-        noiDungChiTiet: $('#content').val(),
-        category: {
-          id: $('#categoryId').val()
-        }
-      };
+    const size = 3;
 
 
-      $.ajax({
-        url: 'http://localhost:8080/api/v1/blogs',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(blog),
-        complete: function () {
-          page = 0;
-          $('#blog-content').html('');
-          display(page);
-        },
-        error: function (res) {
-          console.log("------Lỗi------");
-          console.log(res.status);
-        }
-      });
-    });
-
-    $('#btn-more').click(function () {
-      page++;
-      display(page);
-    });
-
-    function display(pageNumber) {
-      $.ajax({
-        url: `http://localhost:8080/api/v1/blogs/load?page=${pageNumber}&size=3`,
-        method: 'GET',
-        success: function (data) {
-          let html = '';
-          console.log(data);
-          for (let i = 0; i < data.length; i++) {
-            html += `
-              <tr>
-                  <td>${(pageNumber * 3) + i + 1}</td>
-                  <td>${data[i].id}</td>
-                  <td>${data[i].tieuDe}</td>
-                  <td>${data[i].tomTatNoiDung}</td>
-                  <td>${data[i].category.name}</td>
-              </tr>`;
-          }
-          $('#blog-content').append(html);
-        },
-        error: function (xhr) {
-          console.log("Lỗi khi load dữ liệu:");
-          console.log(xhr.status);
-          console.log(xhr.responseText);
-        }
-      });
+    function displayAppend(pageNumber) {
+        $.ajax({
+            url: `http://localhost:8080/api/v1/blogs/load?page=${pageNumber}&size=${size}`,
+            method: 'GET',
+            success: function (data) {
+                let html = '';
+                for (let i = 0; i < data.length; i++) {
+                    html += `
+          <tr>
+              <td>${(pageNumber * size) + i + 1}</td>
+              <td>${data[i].id}</td>
+              <td>${data[i].tieuDe}</td>
+              <td>${data[i].tomTatNoiDung}</td>
+              <td>${data[i].category.name}</td>
+              <td><button class="btn-edit" data-id="${data[i].id}">Sửa</button></td>
+              <td><button class="btn-delete" data-id="${data[i].id}">Xoá</button></td>
+          </tr>`;
+                }
+                $('#blog-content').append(html);
+            },
+            error: function (xhr) {
+                console.log("Lỗi khi load dữ liệu:", xhr.status, xhr.responseText);
+            }
+        });
     }
-  });
+
+
+    function displayReset() {
+        page = 0;
+        $('#blog-content').html('');
+        displayAppend(page);
+    }
+
+    $(document).ready(function () {
+        displayAppend(page);
+
+        $('#btn-save').click(function () {
+            const blog = {
+                tieuDe: $('#tieuDe').val(),
+                tomTatNoiDung: $('#tomTatNoiDung').val(),
+                noiDungChiTiet: $('#noiDungChiTiet').val(),
+                category: {
+                    id: $('#categoryId').val()
+                }
+            };
+            const id = $('#btn-save').data('edit-id');
+            const url = id
+                ? `http://localhost:8080/api/v1/blogs/${id}`
+                : 'http://localhost:8080/api/v1/blogs';
+            const method = id ? 'PATCH' : 'POST';
+
+            $.ajax({
+                url: url,
+                method: method,
+                contentType: 'application/json',
+                data: JSON.stringify(blog),
+                success: function () {
+
+                    $('#blog-content').html('');
+                    page = 0;
+                    displayAppend(page);
+
+
+                    $('#tieuDe').val('');
+                    $('#tomTatNoiDung').val('');
+                    $('#noiDungChiTiet').val('');
+                    $('#categoryId').val('1');
+                    $('#btn-save').removeData('edit-id');
+                },
+                error: function () {
+                    alert("Lỗi khi lưu blog.");
+                }
+            });
+        });
+
+
+        $('#btn-more').click(function () {
+            page++;
+            displayAppend(page);
+        });
+    });
+
+
+    $(document).on('click', '.btn-delete', function () {
+        const id = $(this).data('id');
+        if (confirm("Bạn có chắc muốn xoá?")) {
+            $.ajax({
+                url: `http://localhost:8080/api/v1/blogs/${id}`,
+                method: 'DELETE',
+                success: function () {
+                    displayReset();
+                },
+                error: function () {
+                    alert("Lỗi khi xoá blog");
+                }
+            });
+        }
+    });
+
+
+    $(document).on('click', '.btn-edit', function () {
+        const id = $(this).data('id');
+        $.ajax({
+            url: `http://localhost:8080/api/v1/blogs/${id}`,
+            method: 'GET',
+            success: function (data) {
+                $('#tieuDe').val(data.tieuDe);
+                $('#tomTatNoiDung').val(data.tomTatNoiDung);
+                $('#noiDungChiTiet').val(data.noiDungChiTiet);
+                $('#categoryId').val(data.category.id);
+                $('#btn-save').data('edit-id', data.id);
+            },
+            error: function () {
+                alert("Không tìm thấy blog");
+            }
+        });
+    });
 </script>
+
 </body>
 </html>
