@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h3 th:text="${cauThu.id != null} ? 'Chỉnh sửa' : 'Thêm mới'"></h3>
+<form th:action="@{cau_thu/save}" th:object="${cauThu}" method="post">
+    <input type="hidden" th:field="*{id}">
+    <label>Mã cầu thủ</label>
+    <input type="text" id="maCauThu" th:field="*{maCauThu}" placeholder="Nhập mã cầu thủ">
+    <label>Họ và tên</label>
+    <input type="text" id="ten" th:field="*{ten}" placeholder="Nhập mã cầu thủ">
+    <label>Ngày Sinh </label>
+    <input type="date" id="ngaySinh" th:field="*{ngaySinh}" placeholder="Nhập mã cầu thủ">
+    <label>Kinh Nghiệm</label>
+    <input type="text" id="kinhNghiem" th:field="*{kinhNghiem}" placeholder="Nhập mã cầu thủ">
+    <label>Hình ảnh</label>
+    <input type="text" id="hinhAnh" th:field="*{hinhAnh}" placeholder="Nhập mã cầu thủ">
+    <label>Vị Trí</label>
+    <select>
+        <option th:each="viTri: ${viTriList}" th:value="${viTri.id}" th:text="${viTri.name}">
+        </option>
+    </select>
+    <input type="submit" value="Lưu">
+    <a th:href="@{/cau_thu}">Quay lại</a>
+</form>
+</body>
+</html>
