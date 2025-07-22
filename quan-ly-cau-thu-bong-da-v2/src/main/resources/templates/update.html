@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Edit Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 2rem;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .form-control {
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            border-radius: 5px;
+            padding: 8px 20px;
+        }
+        .btn-secondary {
+            border-radius: 5px;
+            padding: 8px 20px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        h3 {
+            color: #007bff;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h3>Chỉnh sửa cầu thủ</h3>
+        <form th:action="@{/players/save}" th:object="${player}" method="POST" novalidate="novalidate">
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Hình ảnh cầu thủ</label>
+                <input type="text" id="image" th:field="*{image}"  th:class="${#fields.hasErrors('image')} ? 'form-control is-invalid' : 'form-control'"  placeholder="Chèn hình ảnh câu thủ bằng link"/>
+                <!--                <span th:if="${#fields.hasErrors('maSoHeo')}" th:errors="*{maSoHeo}" class="invalid-feedback"></span>-->
+            </div>
+            <div class="mb-3">
+                <label for="playerCode" class="form-label">Mã cầu thủ</label>
+                <input type="text" id="playerCode" th:field="*{playerCode}"  th:class="${#fields.hasErrors('playerCode')} ? 'form-control is-invalid' : 'form-control'"  placeholder="Nhập mã cầu thủ"/>
+                <!--                <span th:if="${#fields.hasErrors('maSoHeo')}" th:errors="*{maSoHeo}" class="invalid-feedback"></span>-->
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Họ và tên</label>
+                <input type="text" id="name" th:field="*{name}"  th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"  placeholder="Nhập tên cầu thủ"/>
+                <!--                <span th:if="${#fields.hasErrors('maSoHeo')}" th:errors="*{maSoHeo}" class="invalid-feedback"></span>-->
+            </div>
+
+            <div class="mb-3">
+                <label for="birthday" class="form-label">Ngày sinh</label>
+                <input type="date" id="birthday" th:field="*{birthday}" th:class="${#fields.hasErrors('birthday')} ? 'form-control is-invalid' : 'form-control'" placeholder="Nhập ngày sinh"/>
+                <!--                <span th:if="${#fields.hasErrors('thoiGianNhapChuong')}" th:errors="*{thoiGianNhapChuong}" class="invalid-feedback"></span>-->
+            </div>
+
+            <div class="mb-3">
+                <label for="experience" class="form-label">Kinh nghiệm</label>
+                <input type="text" id="experience" th:field="*{experience}" th:class="${#fields.hasErrors('experience')} ? 'form-control is-invalid' : 'form-control'" placeholder="Nhập kinh nghiệm chuyên môn" />
+                <!--                <span th:if="${#fields.hasErrors('trongLuongKhiXuat')}" th:errors="*{trongLuongKhiXuat}" class="invalid-feedback"></span>-->
+            </div>
+            <div class="mb-3">
+                <label for="xuatXu" class="form-label">Vị trí</label>
+                <select id="xuatXu" class="form-control" th:field="*{location}">
+                    <option th:each="c:${locationList}"
+                            th:value="${c.id}" th:text="${c.name}">
+                    </option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="Lưu" class="btn btn-primary"/>
+                <a th:href="@{/players}" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
