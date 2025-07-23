@@ -1,0 +1,19 @@
+package com.example.bong_da_v3.service;
+
+import com.example.bong_da_v3.entity.Location;
+import com.example.bong_da_v3.repository.ILocationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class LocationService implements ILocationService{
+    @Autowired
+    private ILocationRepository locationRepository;
+
+    @Override
+    public List<Location> findAll() {
+        return locationRepository.findAll();
+    }
+}
