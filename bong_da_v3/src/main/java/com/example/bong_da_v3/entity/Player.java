@@ -27,7 +27,7 @@ public class Player {
 
     @NotEmpty(message = "Không được để trống")
     @Size(min = 5,max = 100,message = "Tên ít nhất 5 ký tự và tối đa 100 ký tự")
-    @Pattern(regexp = "^[a-zA-Z ]+$",message = "Tên không được chứa các ký tự đặt biệt")
+    @Pattern(regexp = "^[\\p{L}\\s]+$", message = "Tên chỉ được chứa chữ cái và khoảng trắng")
     private String name;
 
     @ValidAge
@@ -44,4 +44,15 @@ public class Player {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'Dự bị'")
+
+    private String status;
+    //do dùng @AllArgsConstructor nên phải dùng này để giá trị được lưu DB
+    @PrePersist
+    public void prePersist() {
+        if (this.status == null || this.status.trim().isEmpty()) {
+            this.status = "Dự bị";
+        }
+    }
+
 }

@@ -117,6 +117,7 @@
         <form th:action="@{/players/create}" th:object="${player}" method="POST" novalidate="novalidate">
             <input type="hidden" th:field="*{id}"/>
 
+
             <div class="mb-3">
                 <label for="image" class="form-label">Hình ảnh cầu thủ</label>
                 <input type="text" id="image" th:field="*{image}"  th:class="${#fields.hasErrors('image')} ? 'form-control is-invalid' : 'form-control'"  placeholder="Chèn hình ảnh câu thủ bằng link"/>

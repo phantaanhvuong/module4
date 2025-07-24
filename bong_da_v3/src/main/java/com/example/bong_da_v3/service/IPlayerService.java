@@ -13,4 +13,7 @@ public interface IPlayerService {
     void deleteById(Long id);
     void add(Player player);
     void edit(Player player,Long id);
+
+    long countByStatus(String status);
+    void save(Player player);
 }

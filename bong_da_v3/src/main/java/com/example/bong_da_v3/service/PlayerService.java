@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Service
 public class PlayerService implements IPlayerService {
+
     @Autowired
     private IPlayerRepository playerRepository;
 
@@ -43,5 +44,16 @@ public class PlayerService implements IPlayerService {
             player.setId(id);
             playerRepository.save(player);
         }
+    }
+
+    @Override
+    public long countByStatus(String status) {
+        return playerRepository.countByStatus(status);
+    }
+
+    @Override
+    public void save(Player player) {
+        playerRepository.save(player);
+
     }
 }

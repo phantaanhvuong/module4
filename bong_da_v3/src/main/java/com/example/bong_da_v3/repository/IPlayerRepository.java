@@ -14,4 +14,6 @@ public interface IPlayerRepository extends JpaRepository<Player, Long> {
             "p.name = '' or p.name like concat('%',:name,'%') "+
     "and p.location.name = '' or p.location.name like  concat('%',:nameLocation,'%') ")
     Page<Player> search(@Param("name") String name,@Param("nameLocation") String nameLocation, Pageable pageable);
+
+    long countByStatus(String status);
 }
