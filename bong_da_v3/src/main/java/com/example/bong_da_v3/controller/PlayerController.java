@@ -5,6 +5,9 @@ import com.example.bong_da_v3.entity.Player;
 import com.example.bong_da_v3.service.ILocationService;
 import com.example.bong_da_v3.service.IPlayerService;
 import com.example.bong_da_v3.service.PlayerService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +20,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("players")
@@ -142,4 +150,113 @@ public class PlayerController {
         redirectAttributes.addFlashAttribute("success","Cập nhật trạng thái thành công");
         return "redirect:/players";
     }
+    @PostMapping("/favorite/{id}")
+    public String addToFavorite(@PathVariable Long id,
+                                HttpSession session,
+                                HttpServletResponse response,
+                                RedirectAttributes redirectAttributes) {
+        // Lấy danh sách yêu thích từ session
+        List<Long> favoriteList = (List<Long>) session.getAttribute("favorites");
+        if (favoriteList == null) {
+            favoriteList = new ArrayList<>();
+        }
+
+        // Thêm nếu chưa có cầu thủ nào được yêu thích
+        if (favoriteList.contains(id)) {
+            redirectAttributes.addFlashAttribute("warning", "Bạn đã yêu thích cầu thủ này rồi!");
+        }else {
+            favoriteList.add(id);
+            session.setAttribute("favorites", favoriteList);
+            // chuyeenr cái list thành chuổi
+            String rawCookieValue = favoriteList.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+            String encodedCookieValue = URLEncoder.encode(rawCookieValue, StandardCharsets.UTF_8);
+
+
+            // tạo cookie
+            Cookie cookie = new Cookie("favorites", encodedCookieValue);
+            cookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+            cookie.setPath("/");
+            response.addCookie(cookie);
+
+            redirectAttributes.addFlashAttribute("success", "Đã thêm vào yêu thích!");
+        }
+        return "redirect:/players/detail/" + id;
+    }
+
+    @GetMapping("/favorites")
+    public String showFavorites(HttpSession session,
+                                @CookieValue(name = "favorites", defaultValue = "") String favoritesCookie,
+                                Model model) {
+
+        // tiếp tuch lấy danh sách yêu thích từ session
+        List<Long> favoriteList = (List<Long>) session.getAttribute("favorites");
+
+        // nếu session không có, thì lấy từ cookie
+        if (favoriteList == null && !favoritesCookie.isEmpty()) {
+            favoriteList = new ArrayList<>();
+
+            try {
+                String decodedCookie = URLDecoder.decode(favoritesCookie, StandardCharsets.UTF_8);
+                String[] idStrings = decodedCookie.split(",");
+                for (String idStr : idStrings) {
+                    try {
+                        Long id = Long.parseLong(idStr);
+                        favoriteList.add(id);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Lỗi: Không thể chuyển '" + idStr + "' thành số.");
+                    }
+                }
+                session.setAttribute("favorites", favoriteList);
+            } catch (Exception e) {
+                System.out.println("Lỗi khi decode cookie: " + e.getMessage());
+            }
+        }
+
+        // từ list id lấy list player
+
+        List<Player> favoritePlayers = new ArrayList<>();
+        if (favoriteList != null) {
+            for (Long playerId : favoriteList) {
+                playerService.findById(playerId).ifPresent(favoritePlayers::add);
+            }
+        }
+
+        model.addAttribute("favoritePlayers", favoritePlayers);
+        return "favorite-list";
+    }
+    @PostMapping("/favorite/remove/{id}")
+    public String removeFromFavorite(@PathVariable Long id,
+                                     HttpSession session,
+                                     HttpServletResponse response,
+                                     RedirectAttributes redirectAttributes) {
+
+        List<Long> favoriteList = (List<Long>) session.getAttribute("favorites");
+
+        if (favoriteList != null && favoriteList.contains(id)) {
+            favoriteList.remove(id);
+            session.setAttribute("favorites", favoriteList);
+
+            // Cập nhật lại cookie sau khi xoá
+            String updatedCookie = favoriteList.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+            String encodedCookie = URLEncoder.encode(updatedCookie, StandardCharsets.UTF_8);
+
+            Cookie cookie = new Cookie("favorites", encodedCookie);
+            cookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+            cookie.setPath("/");
+            response.addCookie(cookie);
+
+            redirectAttributes.addFlashAttribute("success", "Đã xoá khỏi yêu thích!");
+        } else {
+            redirectAttributes.addFlashAttribute("errors", "Cầu thủ không tồn tại trong danh sách yêu thích!");
+        }
+
+        return "redirect:/players/favorites";
+    }
+
+
+
 }

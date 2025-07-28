@@ -80,9 +80,18 @@
 <!--<div th:replace="fragments/header :: navbar"></div>-->
 <div class="container">
     <!-- Link toàn bộ card -->
-    <a th:href="@{'/players/' + ${player.get().id}}" style="text-decoration: none; color: inherit;">
+
         <div class="card">
             <h3>Chi tiết cầu thủ</h3>
+            <div th:if="${warning}" class="alert alert-warning" role="alert">
+                <span th:text="${warning}"></span>
+            </div>
+
+            <div class="notify">
+                <div th:if="${success}" class="alert alert-success" role="alert" id="successAlert">
+                    <span th:text="${success}"></span>
+                </div>
+            </div>
 
             <div class="detail-item">
                 <label>Hình ảnh</label>
@@ -116,10 +125,18 @@
                 <div><span th:text="${player.get().location.name}"></span></div>
             </div>
         </div>
-    </a>
+
 
     <!-- Nút quay lại -->
-    <a th:href="@{/players}" class="btn btn-secondary mt-3">Quay lại trang chủ</a>
+    <div class="col-md-auto d-flex align-items-center gap-2 mt-3">
+        <a th:href="@{/players}" class="btn btn-info">Quay lại trang chủ</a>
+
+        <form th:action="@{/players/favorite/{id}(id=${player.get().id})}" method="post" class="m-0 p-0">
+            <button type="submit" class="btn btn-warning">💖 Yêu thích</button>
+        </form>
+    </div>
+
+
 </div>
 
 

@@ -125,10 +125,12 @@
         .alert {
             transition: all 0.3s ease;
         }
+
         .card:hover {
             background-color: #f1f9ff;
             cursor: pointer;
         }
+
         .card .btn {
             white-space: nowrap;
             font-size: 0.875rem;
@@ -137,15 +139,16 @@
         .card .btn.w-100 {
             flex: 1;
         }
+
         .player-card {
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
         .player-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 0 12px rgba(0, 123, 255, 0.2);
         }
-
 
 
     </style>
@@ -158,6 +161,12 @@
             <a th:href="@{/players/create}" class="btn btn-success d-flex align-items-center">
                 <i class="bi bi-plus-circle me-1"></i> Thêm cầu thủ
             </a>
+
+            <a th:href="@{players/favorites}" class="btn btn-outline-danger mt-3 ms-2">
+                ❤️ Danh sách yêu thích
+            </a>
+
+
         </div>
 
         <div class="row g-3 align-items-end mb-4">
@@ -206,14 +215,16 @@
                     <h6 class="card-subtitle mb-2 text-muted">
                         <span>Cầu thủ: </span><span th:text="${row.name}"></span>
                     </h6>
-                    <p class="card-text mb-1"><b>Ngày sinh:</b> <span th:text="${#temporals.format(row.birthday, 'dd-MM-yyyy')}"></span></p>
+                    <p class="card-text mb-1"><b>Ngày sinh:</b> <span
+                            th:text="${#temporals.format(row.birthday, 'dd-MM-yyyy')}"></span></p>
                     <p class="card-text mb-1"><b>Kinh nghiệm:</b> <span th:text="${row.experience}+' năm'"></span></p>
                     <p class="card-text mb-1"><b>Vị trí:</b> <span th:text="${row.location.name}"></span></p>
                     <p class="card-text mb-2"><b>Tình trạng:</b> <span th:text="${row.status}"></span></p>
 
                     <div class="d-flex justify-content-between gap-2 mb-2">
-<!--                        <a th:href="@{/players/detail/{id}(id=${row.id})}" class="btn btn-sm btn-outline-primary flex-fill">Chi Tiết</a>-->
-                        <a th:href="@{/players/{id}/edit(id=${row.id})}" class="btn btn-sm btn-outline-primary flex-fill">Chỉnh sửa</a>
+                        <!--                        <a th:href="@{/players/detail/{id}(id=${row.id})}" class="btn btn-sm btn-outline-primary flex-fill">Chi Tiết</a>-->
+                        <a th:href="@{/players/{id}/edit(id=${row.id})}"
+                           class="btn btn-sm btn-outline-primary flex-fill">Chỉnh sửa</a>
                         <button type="button"
                                 class="btn btn-sm btn-outline-danger flex-fill"
                                 data-bs-toggle="modal"

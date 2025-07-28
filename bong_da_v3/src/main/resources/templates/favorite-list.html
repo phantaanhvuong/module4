@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách yêu thích</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin-top: 30px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-body img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            border-radius: 8px;
+        }
+
+        .btn-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .card-text span:first-child {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-primary mb-4">⚽ Danh sách cầu thủ yêu thích</h2>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${errors}" class="alert alert-danger" th:text="${errors}"></div>
+
+
+    <div th:if="${#lists.isEmpty(favoritePlayers)}" class="alert alert-info">
+        Bạn chưa có cầu thủ nào trong danh sách yêu thích 😢
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4" th:if="${!#lists.isEmpty(favoritePlayers)}">
+        <div class="col" th:each="player : ${favoritePlayers}">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <img th:src="${player.image != null} ? ${player.image} : '@{/images/default-avatar.png}'"
+                         alt="Avatar">
+                    <h5 class="card-title" th:text="${player.name}">Tên cầu thủ</h5>
+                    <p class="card-text"><span>Vị trí:</span> <span th:text="${player.location.name}"></span></p>
+                    <p class="card-text"><span>Kinh nghiệm:</span> <span th:text="${player.experience + ' năm'}"></span></p>
+                    <p class="card-text"><span>Tình trạng:</span> <span th:text="${player.status}"></span></p>
+
+                    <a th:href="@{/players/detail/{id}(id=${player.id})}" class="btn btn-outline-primary btn-sm mt-2">
+                        🔍 Xem chi tiết
+                    </a>
+                    <form th:action="@{/players/favorite/remove/{id}(id=${player.id})}" method="post" style="display:inline">
+                        <button class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xoá khỏi yêu thích không?')">❌ Xoá</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <a th:href="@{/players}" class="btn btn-secondary btn-info">← Quay lại danh sách cầu thủ</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
