@@ -40,7 +40,7 @@ public class RestPlayerController {
         return new  ResponseEntity<>(playerPage, HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<?> save(@Validated @RequestBody Player player, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model){
+    public ResponseEntity<?> save(@Validated @RequestBody Player player){
         if (player.getStatus() == null || player.getStatus().isBlank()) {
             player.setStatus("Dự bị");
         }
@@ -58,8 +58,7 @@ public class RestPlayerController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePlayer(@PathVariable Long id,
-                                          @Validated @RequestBody Player updatedPlayer,
-                                          BindingResult bindingResult) {
+                                          @Validated @RequestBody Player updatedPlayer) {
         Optional<Player> optionalPlayer = playerService.findById(id);
         if (optionalPlayer.isEmpty()) {
             return new ResponseEntity<>("Không tìm thấy cầu thủ để cập nhật", HttpStatus.NOT_FOUND);
