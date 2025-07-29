@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -55,5 +56,10 @@ public class PlayerService implements IPlayerService {
     public void save(Player player) {
         playerRepository.save(player);
 
+    }
+
+    @Override
+    public List<Player> findAll() {
+        return playerRepository.findAll();
     }
 }

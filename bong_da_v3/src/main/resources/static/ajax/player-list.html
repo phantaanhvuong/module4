@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách cầu thủ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+  <h2 class="mb-4"> Danh sách cầu thủ</h2>
+
+
+  <button class="btn btn-primary mb-3" id="show-form-btn"> Thêm cầu thủ mới</button>
+
+  <form id="player-form" class="border rounded p-3 bg-light" style="display: none;">
+    <h4>Thêm mới cầu thủ</h4>
+    <div class="mb-3">
+      <label>Mã cầu thủ:</label>
+      <input type="text" class="form-control" name="playerCode" required>
+    </div>
+    <div class="mb-3">
+      <label>Tên:</label>
+      <input type="text" class="form-control" name="name" required>
+    </div>
+    <div class="mb-3">
+      <label>Ngày sinh:</label>
+      <input type="date" class="form-control" name="birthday" required>
+    </div>
+    <div class="mb-3">
+      <label>Kinh nghiệm:</label>
+      <input type="number" class="form-control" name="experience" required>
+    </div>
+    <div class="mb-3">
+      <label>Vị trí:</label>
+      <select class="form-select" name="locationId" id="location-select" required>
+        <option value="">-- Chọn vị trí --</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Thêm cầu thủ</button>
+  </form>
+
+  <table class="table table-bordered table-striped mt-4">
+    <thead class="table-dark">
+    <tr>
+      <th>Mã</th>
+      <th>Tên</th>
+      <th>Ngày sinh</th>
+      <th>Kinh nghiệm</th>
+      <th>Vị trí</th>
+      <th>Trạng thái</th>
+    </tr>
+    </thead>
+    <tbody id="player-table-body">
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal thành công -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="successModalLabel">✅ Thành công</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">Cầu thủ đã được thêm thành công!</div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  $(document).ready(function () {
+
+
+    // Load danh sách cầu thủ
+    function loadPlayers() {
+      $.ajax({
+        url: "/api/players/all",
+        method: "GET",
+        success: function (data) {
+          let players = data.content || data;
+          let tableBody = $("#player-table-body").empty();
+          players.forEach(function (player) {
+            let row = `
+              <tr>
+                <td>${player.playerCode}</td>
+                <td>${player.name}</td>
+                <td>${player.birthday}</td>
+                <td>${player.experience} năm</td>
+                <td>${player.location ? player.location.name : ''}</td>
+                <td>${player.status}</td>
+              </tr>
+            `;
+            tableBody.append(row);
+          });
+        },
+        error: function () {
+          alert(" Lỗi khi tải danh sách cầu thủ!");
+        }
+      });
+    }
+
+    //  Khi submit form
+    $("#player-form").on("submit", function (e) {
+      e.preventDefault();
+
+      const formData = {
+        playerCode: $("input[name='playerCode']").val(),
+        name: $("input[name='name']").val(),
+        birthday: $("input[name='birthday']").val(),
+        experience: $("input[name='experience']").val(),
+        location: {
+          id: $("select[name='locationId']").val()
+        }
+      };
+
+      $.ajax({
+        url: "/api/players",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(formData),
+        success: function () {
+          $("#player-form")[0].reset();
+          const modal = new bootstrap.Modal(document.getElementById('successModal'));
+          modal.show();
+          loadPlayers();
+        },
+        error: function (xhr) {
+          alert(" Lỗi khi thêm cầu thủ: " + xhr.responseText);
+        }
+      });
+    });
+
+    // Hiện/ẩn form
+    $("#show-form-btn").click(function () {
+      $("#player-form").slideToggle();
+    });
+
+
+    loadLocations();
+    loadPlayers();
+  });
+  // Load danh sách vị trí vào select
+  function loadLocations() {
+    $.ajax({
+      url: "/api/players/locations",
+      method: "GET",
+      success: function (locations) {
+        let select = $("#location-select");
+        select.empty(); // Clear cũ
+        select.append(`<option value="" disabled selected>-- Chọn vị trí --</option>`);
+        locations.forEach(function (loc) {
+          select.append(`<option value="${loc.id}">${loc.name}</option>`);
+        });
+      },
+      error: function () {
+        alert(" Không thể tải danh sách vị trí!");
+      }
+    });
+  }
+  loadLocations();
+
+</script>
+</body>
+</html>

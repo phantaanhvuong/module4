@@ -4,6 +4,7 @@ import com.example.bong_da_v3.entity.Player;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IPlayerService {
@@ -16,4 +17,6 @@ public interface IPlayerService {
 
     long countByStatus(String status);
     void save(Player player);
+
+    List<Player> findAll();
 }

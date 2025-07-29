@@ -1,6 +1,8 @@
 package com.example.bong_da_v3.controller;
 
+import com.example.bong_da_v3.entity.Location;
 import com.example.bong_da_v3.entity.Player;
+import com.example.bong_da_v3.service.ILocationService;
 import com.example.bong_da_v3.service.IPlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +30,8 @@ import java.util.Optional;
 public class RestPlayerController {
     @Autowired
     private IPlayerService playerService;
+    @Autowired
+    private ILocationService locationService;
     @GetMapping("")
     public ResponseEntity<Page<Player>> showList(@RequestParam(required = false, defaultValue = "0") int page,
                                                  @RequestParam(required = false, defaultValue = "5") int size,
@@ -39,6 +43,12 @@ public class RestPlayerController {
         Page<Player> playerPage = playerService.search(name,nameLocation,pageable);
         return new  ResponseEntity<>(playerPage, HttpStatus.OK);
     }
+    @GetMapping("/all")
+    public ResponseEntity<List<Player>> getAllPlayers() {
+        List<Player> players = playerService.findAll();
+        return new ResponseEntity<>(players, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<?> save(@Validated @RequestBody Player player){
         if (player.getStatus() == null || player.getStatus().isBlank()) {
@@ -76,6 +86,11 @@ public class RestPlayerController {
         playerService.save(existingPlayer);
         return new ResponseEntity<>(existingPlayer, HttpStatus.OK);
     }
+    @GetMapping("/locations")
+    public ResponseEntity<List<Location>> getAllLocations() {
+        return new ResponseEntity<>(locationService.findAll(), HttpStatus.OK);
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
