@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <th:block th:insert="~{layout/layout::library}"></th:block>
+</head>
+<body>
+<th:block th:insert="~{layout/layout::my-navbar}"></th:block>
+<h1>Thêm mới</h1>
+<form action="/students/add" method="post" th:object="${student}">
+  <!--    <input th:field="*{id}" placeholder="Nhập id"><br>-->
+  <input  th:field="*{name}" placeholder="Nhập tên"><br>
+  <input  th:field="*{gender}" type="radio" value="0"> Nam
+  <input  th:field="*{gender}" type="radio" value="1"> Nữ<br>
+  <!--     <select th:field="*{className}" >-->
+  <!--         <option value="C02">C02</option>-->
+  <!--         <option value="C03">C03</option>-->
+  <!--         <option value="C04">C04</option>-->
+  <!--     </select>-->
+  <button>Lưu</button>
+</form>
+</body>
+</html>

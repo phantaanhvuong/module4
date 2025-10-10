@@ -1,7 +1,6 @@
 package com.example.ung_dung_blog.service;
 
-import com.example.ung_dung_blog.model.Blog;
-import com.example.ung_dung_blog.model.Category;
+import com.example.ung_dung_blog.model.blog.Blog;
 import com.example.ung_dung_blog.repository.IBlogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,13 +38,24 @@ public class BlogService implements IBlogService{
         blogRepository.deleteById(id);
     }
 
-    @Override
-    public Page<Blog> search(String category,String tieuDe, Pageable pageable) {
-        return blogRepository.findBlogsByCategory_NameContainingAndTieuDeContaining(category,tieuDe,pageable);
-    }
 
     @Override
     public List<Blog> findByCategory_Id(int id) {
         return blogRepository.findByCategory_Id(id);
     }
+
+    @Override
+    public List<Blog> findByTieuDeContaining(String keyword) {
+        return blogRepository.findByTieuDeContaining(keyword);
+    }
+
+    @Override
+    public void delete(int id) {
+        blogRepository.deleteById(id);
+    }
+    @Override
+    public Page<Blog> search(String category, String tieuDe, Pageable pageable) {
+        return blogRepository.search(category, tieuDe, pageable);
+    }
+
 }

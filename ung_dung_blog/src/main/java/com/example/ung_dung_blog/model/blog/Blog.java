@@ -1,4 +1,4 @@
-package com.example.ung_dung_blog.model;
+package com.example.ung_dung_blog.model.blog;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,5 +20,4 @@ public class Blog {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-
 }

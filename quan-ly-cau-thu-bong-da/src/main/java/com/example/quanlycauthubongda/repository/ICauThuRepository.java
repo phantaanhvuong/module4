@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface ICauThuRepository extends JpaRepository<CauThu, Long> {
 
     @Query("select ct from CauThu ct where "+
-            "ct.ten = '' or ct.ten like %:ten%")
+            "ct.ten = '' or ct.ten like concat('%',:ten,'%') ")
     Page<CauThu> search(@Param("ten") String ten, Pageable pageable);
 }

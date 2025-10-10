@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <th:block th:insert="~{layout/layout::library}"></th:block>
+</head>
+<body>
+<th:block th:insert="~{layout/layout::my-navbar}"></th:block>
+<h1>Danh sách sinh viên</h1>
+<a href="/students/add">Thêm mới</a>
+<form action="/students" method="get">
+    <input th:value="${searchName}" class="form-control-sm" name="searchName" placeholder="Nhap ten can tim">
+    <button class="btn btn-primary btn-sm">Tim Kiem</button>
+</form>
+<table class="table table-dark">
+    <tr>
+        <th>STT</th>
+        <th>ID</th>
+        <th>Tên</th>
+        <th>Giới tính</th>
+        <th>Lớp học</th>
+        <th>Tài khoản</th>
+        <th>Chi tiết 1</th>
+        <th>Chi tiết 2</th>
+    </tr>
+    <tr th:each="student,status:${studentPage.content}">
+        <td th:text="${status.count}"></td>
+        <td th:text="${student.id}"></td>
+        <td th:text="${student.name}"></td>
+        <td th:text="${student.gender}"></td>
+        <td th:text="${student.getClassCG().getName()}"></td>
+        <td th:text="${student.getJame().getUsername()}"></td>
+        <td><a th:href="@{/students/detail(id=${student.id})}">Detail1</a></td>
+        <td><a th:href="@{/students/detail/__${student.id}__}">Detail1</a></td>
+    </tr>
+    <tr th:if="${studentPage.totalPages==0}">
+        <td colspan="8">Danh sách trống</td>
+    </tr>
+</table>
+
+<a th:if="${studentPage.hasPrevious()}" th:href="@{/students(page=${studentPage.number -1},searchName = ${searchName})}">truoc</a>
+<span th:text="${studentPage.number + 1}"></span>/<span th:text="${studentPage.totalPages}"></span>
+<a th:if="${studentPage.hasNext()}" th:href="@{/students(page=${studentPage.number +1},searchName = ${searchName})}">sau</a>
+</body>
+</html>

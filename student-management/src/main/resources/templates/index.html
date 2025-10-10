@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <title>List Blog</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-top: 2rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table th {
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+
+    .table td {
+      vertical-align: middle;
+    }
+
+    .btn-primary {
+      border-radius: 5px;
+      padding: 8px 20px;
+    }
+
+    .btn-danger {
+      border-radius: 5px;
+      padding: 8px 20px;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+    }
+
+    .search-form {
+      max-width: 500px;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-form input {
+      border-radius: 5px 0 0 5px;
+    }
+
+    .search-form button {
+      border-radius: 0 5px 5px 0;
+    }
+
+    .notify {
+      margin-top: 1rem;
+    }
+
+    .notify .alert {
+      border-radius: 5px;
+    }
+
+    .action-links a {
+      margin-right: 10px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <form th:action="@{/students}" method="get" class="container mt-4">
+    <h2 class="text-primary mb-4">Quản lý sinh viên</h2>
+    <div class="col-md-auto d-flex gap-2">
+      <a th:href="@{/students/create}" class="btn btn-success d-flex align-items-center">
+        <i class="bi bi-plus-circle me-1"></i> Thêm sinh viên
+      </a>
+    </div>
+
+    <div class="row g-3 align-items-end mb-4">
+      <div class="col-md-3">
+        <label class="form-label">Tìm tên sinh viên</label>
+        <input type="text" class="form-control" name="name" placeholder="Nhập tên sinh viên cần tìm"
+               th:value="${name}">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Lọc theo lớp</label>
+        <select class="form-select" name="nameType">
+          <option value="">-- Chọn thể loại --</option>
+          <option th:each="cat : ${typeList}"
+                  th:value="${cat.name}"
+                  th:text="${cat.name}"
+                  th:selected="${cat.name == nameType}">
+          </option>
+        </select>
+      </div>
+      <!-- Nút tìm kiếm -->
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-primary">🔍 Tìm kiếm</button>
+      </div>
+    </div>
+  </form>
+  <div class="notify">
+    <div th:if="${success}" class="alert alert-success" role="alert"  id="successAlert">
+      <span th:text="${success}"></span>
+    </div>
+  </div>
+
+
+  <div class="table-responsive">
+    <table class="table table-hover" id="player">
+      <thead>
+      <tr>
+        <th>Mã sinh viên</th>
+        <th>Tên sinh viên</th>
+        <th>Địa chỉ</th>
+        <th>Số điện thoại</th>
+        <th>Lớp</th>
+       <th>Hành động</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="row,rowStat : ${studentPage}">
+<!--        <td>-->
+<!--          <img th:src="${row.image != null} ? ${row.image} : '@{/images/default-avatar.png}'"-->
+<!--               alt="Avatar"-->
+<!--               class="rounded-circle border"-->
+<!--               style="width: 50px; height: 50px; object-fit: cover;">-->
+<!--        </td>-->
+        <td th:text="${row.studentCode}"></td>
+        <td th:text="${row.name}"></td>
+        <td th:text="${row.address}"></td>
+        <td th:text="${row.sdt}"></td>
+
+<!--        <td th:text="${#temporals.format(row.birthday, 'dd-MM-yyyy')}"></td>-->
+        <td th:text="${row.studentClass.name}"></td>
+        <td>
+          <a th:href="@{/students/detail/{id}(id=${row.id})}" class="btn btn-sm btn-outline-primary">Chi Tiết</a>
+          <a th:href="@{/students/{id}/edit(id=${row.id})}" class="btn btn-sm btn-outline-primary">Chỉnh sửa</a>
+
+
+          <button type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#confirmDeleteModal"
+                  th:attr="data-id=${row.id}, data-name=${row.name}">
+            Xoá
+          </button>
+        </td>
+      </tr>
+
+
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-12" th:if="${studentPage.totalPages==0}">
+    <div class="alert alert-info">Danh sách trống</div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog mt-5">
+    <div class="modal-content">
+      <form id="deleteForm" th:action="@{/students/delete}" method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Xác nhận xoá sinh viên</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc muốn xoá sinh viên có tên là <strong id="name"></strong> không?</p>
+          <input type="hidden" name="id" id="deleteId"/>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+          <button type="submit" class="btn btn-danger">Xoá</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+  confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const blogId = button.getAttribute('data-id');
+    const deleteIdInput = document.getElementById('deleteId');
+    const namePlayer = document.getElementById('name');
+    namePlayer.textContent = button.getAttribute('data-name');
+    deleteIdInput.value = blogId;
+  });
+  window.addEventListener('DOMContentLoaded', function () {
+    const successAlert = document.getElementById('successAlert');
+    if (successAlert) {
+      setTimeout(() => {
+        successAlert.classList.add('fade');
+        successAlert.classList.remove('show');
+        successAlert.style.display = 'none';
+      }, 3000);
+    }
+  });
+</script>
+
+<div class="d-flex justify-content-center align-items-center mt-4">
+  <a th:if="${studentPage.hasPrevious()}"
+     th:href="@{/students(page=${studentPage.number -1},name=${name},nameType=${nameType})}"
+     class="btn btn-outline-secondary me-2">Trước</a>
+  <span class="me-2">Trang <span th:text="${studentPage.number +1}"></span> /
+    <span th:text="${studentPage.totalPages}"></span></span>
+  <a th:if="${studentPage.hasNext()}"
+     th:href="@{/students(page=${studentPage.number +1},name=${name},nameType=${nameType})}"
+     class="btn btn-outline-secondary">Sau</a>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

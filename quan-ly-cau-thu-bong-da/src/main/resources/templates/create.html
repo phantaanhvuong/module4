@@ -19,7 +19,7 @@
     <label>Hình ảnh</label>
     <input type="text" id="hinhAnh" th:field="*{hinhAnh}" placeholder="Nhập mã cầu thủ">
     <label>Vị Trí</label>
-    <select>
+    <select th:field="*{viTri}">
         <option th:each="viTri: ${viTriList}" th:value="${viTri.id}" th:text="${viTri.name}">
         </option>
     </select>

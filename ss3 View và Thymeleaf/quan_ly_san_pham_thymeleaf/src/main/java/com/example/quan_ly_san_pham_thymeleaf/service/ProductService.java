@@ -5,7 +5,9 @@ import com.example.quan_ly_san_pham_thymeleaf.repository.IProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+@Transactional
 @Service
 public class ProductService implements IProductService{
     @Autowired
@@ -26,13 +28,14 @@ public class ProductService implements IProductService{
         return productRepository.findById(id);
     }
 
-    @Override
-    public void update(int id, Product product) {
-        productRepository.update(id, product);
-    }
 
     @Override
     public void remove(int id) {
         productRepository.remove(id);
+    }
+
+    @Override
+    public List<Product> searchByName(String keyword) {
+        return productRepository.searchByName(keyword);
     }
 }

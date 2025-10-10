@@ -1,6 +1,6 @@
 package com.example.ung_dung_blog.service;
 
-import com.example.ung_dung_blog.model.Category;
+import com.example.ung_dung_blog.model.blog.Category;
 import com.example.ung_dung_blog.repository.ICategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

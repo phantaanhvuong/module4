@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -32,11 +33,13 @@ public class PlayerController {
     public String showList(@RequestParam(required = false, defaultValue = "0") int page,
                            @RequestParam(required = false, defaultValue = "5") int size,
                            @RequestParam(required = false, defaultValue = "") String name,
+                           @RequestParam(required = false, defaultValue = "") String nameLocation,
                            Model model){
         Sort sort = Sort.by(Sort.Direction.ASC,"name");
         Pageable pageable = PageRequest.of(page,size,sort);
-        Page<Player> playerPage = playerService.findByName(name, pageable);
+        Page<Player> playerPage = playerService.search(name,nameLocation,pageable);
         model.addAttribute("name", name);
+        model.addAttribute("nameLocation" ,nameLocation);
         model.addAttribute("playerPage",playerPage);
         return "index";
 
@@ -47,7 +50,7 @@ public class PlayerController {
         return "create";
     }
     @PostMapping("/save")
-    public String save(@ModelAttribute Player player, RedirectAttributes redirectAttributes){
+    public String save(@Validated @ModelAttribute Player player, RedirectAttributes redirectAttributes){
         playerService.addOrUpdate(player);
         redirectAttributes.addFlashAttribute("success", "Cập nhật thành công");
         return "redirect:/players";

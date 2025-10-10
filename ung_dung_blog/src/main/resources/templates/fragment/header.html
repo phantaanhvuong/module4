@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<div th:fragment="navbar">
+    <div>
+        <a th:href="@{/blogs}">Trang chủ</a>
+    </div>
+
+    <div sec:authorize="isAuthenticated()">
+        Xin chào <span sec:authentication="name"></span> |
+        <a th:href="@{/blogs/create}">Tạo bài viết</a> |
+        <a th:href="@{/logout}">Đăng xuất</a>
+    </div>
+
+    <div sec:authorize="!isAuthenticated()">
+        <a th:href="@{/login}">Đăng nhập</a> |
+        <a th:href="@{/register}">Đăng ký</a>
+    </div>
+
+    <hr>
+</div>
+</body>
+</html>

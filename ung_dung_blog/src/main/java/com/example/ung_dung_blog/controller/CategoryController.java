@@ -1,6 +1,6 @@
 package com.example.ung_dung_blog.controller;
 
-import com.example.ung_dung_blog.model.Category;
+import com.example.ung_dung_blog.model.blog.Category;
 import com.example.ung_dung_blog.service.IBlogService;
 import com.example.ung_dung_blog.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;

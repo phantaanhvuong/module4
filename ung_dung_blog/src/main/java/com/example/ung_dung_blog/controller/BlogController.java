@@ -1,7 +1,7 @@
 package com.example.ung_dung_blog.controller;
 
-import com.example.ung_dung_blog.model.Blog;
-import com.example.ung_dung_blog.model.Category;
+import com.example.ung_dung_blog.model.blog.Blog;
+import com.example.ung_dung_blog.model.blog.Category;
 import com.example.ung_dung_blog.service.IBlogService;
 import com.example.ung_dung_blog.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +35,7 @@ public class BlogController {
                            @RequestParam(required = false,defaultValue = "")String category,
                            @RequestParam(required = false,defaultValue = "")String tieuDe,
                            Model model){
+        System.out.println("✅ showList() in BlogController was called!");
         Sort sort = Sort.by(Sort.Direction.ASC,"tieuDe");
         Pageable pageable = PageRequest.of(page,size,sort);
         Page<Blog> blogPage = blogService.search(category,tieuDe,pageable);
@@ -71,7 +72,6 @@ public class BlogController {
     @GetMapping("/{id}/edit")
     public String update(@PathVariable int id, Model model) {
         model.addAttribute("blog", blogService.findById(id));
-//        model.addAttribute("categoryList",categoryService.findAll());
         return "/update";
     }
 

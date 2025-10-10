@@ -1,4 +1,4 @@
-package com.example.quan_ly_khach_hangthymeleaf.config;
+package com.example.demo.config;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 

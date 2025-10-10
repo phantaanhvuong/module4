@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 public interface IPlayerService {
-    Page<Player> findByName(String name , Pageable pageable);
+    Page<Player> search(String name ,String nameLocation, Pageable pageable);
     void addOrUpdate(Player player);
     Optional<Player> findById(Long id);
     void deleteById(Long id);

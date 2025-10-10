@@ -8,6 +8,7 @@
 <body>
 <form th:action="@{/cau_thu}" method="get">
   <h2>Quản lý cầu thủ</h2><br>
+    <a th:href="@{cau_thu/create}">thêm mới</a>
     <label>tìm kiếm theo tên</label>
     <input type="text" name="ten" placeholder="nhập tên cần tìm" th:value="${ten}">
     <button type="submit">Tìm kiếm</button>

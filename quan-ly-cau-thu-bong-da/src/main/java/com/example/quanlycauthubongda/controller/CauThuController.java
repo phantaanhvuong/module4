@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("cau_thu")
@@ -51,7 +52,8 @@ public class CauThuController {
     }
     @GetMapping("/{id}/edit")
     public String update(@PathVariable Long id, Model model) {
-        model.addAttribute("cauThu", cauThuService.findById(id));
+        Optional<CauThu> cauThu = cauThuService.findById(id);
+        model.addAttribute("cauThu", cauThu);
         return "create";
 
     }
@@ -61,4 +63,5 @@ public class CauThuController {
         redirectAttributes.addFlashAttribute("success", "Xoá thành công");
         return "redirect:/cau_thu";
     }
+
 }

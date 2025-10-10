@@ -1,3 +1,5 @@
+package com.example.quan_ly_khach_hangthymeleaf.config;
+
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {

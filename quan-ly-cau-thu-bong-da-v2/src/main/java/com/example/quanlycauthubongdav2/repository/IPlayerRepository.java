@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IPlayerRepository extends JpaRepository<Player, Long> {
     @Query("select p from Player p where "+
-            "p.name = '' or p.name like concat('%',:name,'%') ")
-    Page<Player> search(@Param("name") String name, Pageable pageable);
+            "p.name = '' or p.name like concat('%',:name,'%') "+
+    "and p.location.name = '' or p.location.name like  concat('%',:nameLocation,'%') ")
+    Page<Player> search(@Param("name") String name,@Param("nameLocation") String nameLocation, Pageable pageable);
 }

@@ -1,4 +1,5 @@
 package com.example.kiem_tra_ket_thuc_module_4.controller;
+
 import com.example.kiem_tra_ket_thuc_module_4.entity.GiaoDich;
 import com.example.kiem_tra_ket_thuc_module_4.entity.KhachHang;
 import com.example.kiem_tra_ket_thuc_module_4.service.IGiaoDichService;
@@ -25,10 +26,12 @@ public class GiaoDichController {
     private IKhachHangService khachHangService;
     @Autowired
     private IGiaoDichService giaoDichService;
+
     @ModelAttribute("categoryList")
-    public List<KhachHang> getAllCategory(){
+    public List<KhachHang> getAllCategory() {
         return khachHangService.findAll();
     }
+
     @GetMapping("")
     public String showList(@RequestParam(required = false, defaultValue = "0") int page,
                            @RequestParam(required = false, defaultValue = "5") int size,
@@ -49,27 +52,30 @@ public class GiaoDichController {
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("giaoDich", new GiaoDich());
-//        model.addAttribute("categoryList",categoryService.findAll());
+        model.addAttribute("khachHangList",khachHangService.findAll());
         return "/create";
     }
+
     @PostMapping("/save")
-    public String save(@Valid @ModelAttribute GiaoDich giaoDich , BindingResult bindingResult, RedirectAttributes redirectAttributes){
-        if (bindingResult.hasErrors()){
+    public String save(@Valid @ModelAttribute GiaoDich giaoDich, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
             return "/create";
         }
         giaoDichService.add(giaoDich);
-        redirectAttributes.addFlashAttribute("success","Thêm dữ liệu thành công");
+        redirectAttributes.addFlashAttribute("success", "Thêm dữ liệu thành công");
         return "redirect:/giao_dich";
     }
+
     @PostMapping("/delete")
-    public String delete(GiaoDich giaoDich, RedirectAttributes redirectAttributes){
+    public String delete(GiaoDich giaoDich, RedirectAttributes redirectAttributes) {
         giaoDichService.remove(giaoDich.getId());
-        redirectAttributes.addFlashAttribute("success","Xoá thành công");
+        redirectAttributes.addFlashAttribute("success", "Xoá thành công");
         return "redirect:/giao_dich";
     }
+
     @GetMapping("/detail/{id}")
-    public String detail2(@PathVariable(name = "id") Long id, Model model){
-        model.addAttribute("giaoDich",giaoDichService.findById(id));
+    public String detail2(@PathVariable(name = "id") Long id, Model model) {
+        model.addAttribute("giaoDich", giaoDichService.findById(id));
         return "view";
     }
 }

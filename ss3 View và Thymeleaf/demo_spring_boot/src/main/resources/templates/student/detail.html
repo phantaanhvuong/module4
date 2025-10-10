@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <th:block th:insert="~{layout/layout::library}"></th:block>
+</head>
+<body>
+<th:block th:insert="~{layout/layout::my-navbar}"></th:block>
+<h1>Detail</h1>
+<span>ID</span>
+<span th:text="${student.id}"></span><br>
+<span>Name</span>
+<span th:text="${student.name}"></span>
+</body>
+</html>

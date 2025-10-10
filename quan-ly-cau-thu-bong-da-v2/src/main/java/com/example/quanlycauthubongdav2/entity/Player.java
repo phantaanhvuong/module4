@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import validation.ValidAge;
 
 import java.time.LocalDate;
 
@@ -26,10 +27,10 @@ public class Player {
 
     @NotEmpty(message = "Không được để trống")
     @Size(min = 5,max = 100,message = "tên ít nhất 5 ký tự và tối đa 100 ký tự")
-    @Pattern(regexp = "^[a-zA-Z0-9 ]+$",message = "Tên không được chứa các ký tự đặt biệt")
+    @Pattern(regexp = "^[a-zA-Z ]+$",message = "Tên không được chứa các ký tự đặt biệt")
     private String name;
 
-
+    @ValidAge
     private LocalDate birthday;
 
     @Pattern(regexp = "^[1-9]*$", message = "Kinh nghiệm phải là số nguyên dương")

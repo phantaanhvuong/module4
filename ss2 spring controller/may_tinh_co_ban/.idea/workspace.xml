@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5c274940-9c35-41d9-b23c-d0c0f0eb7629" name="Changes" comment="" />
+    <list default="true" id="5c274940-9c35-41d9-b23c-d0c0f0eb7629" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,9 +35,9 @@
     <option name="FILTER_DEBUG" value="true" />
     <option name="CUSTOM_FILTER" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2yfskuP5QY1NSaUdZp3fwpOxWKL" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -49,7 +51,7 @@
     "Tomcat Server.Tomcat 9.0.105.executor": "Run",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/codegym/Module4/ss2 spring controller/may_tinh_co_ban/src/main/webapp/WEB-INF",
+    "last_opened_file_path": "D:/codegym/Module4/ss2 spring controller/bai_tap/may_tinh_co_ban",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -168,7 +170,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1750237110351</updated>
-      <workItem from="1750237111479" duration="2148000" />
+      <workItem from="1750237111479" duration="2948000" />
     </task>
     <servers />
   </component>

@@ -15,8 +15,8 @@ public class PlayerService implements IPlayerService {
     private IPlayerRepository playerRepository;
 
     @Override
-    public Page<Player> findByName(String name, Pageable pageable) {
-        return playerRepository.search(name, pageable);
+    public Page<Player> search(String name,String nameLocation, Pageable pageable) {
+        return playerRepository.search(name, nameLocation,pageable);
     }
 
     @Override
