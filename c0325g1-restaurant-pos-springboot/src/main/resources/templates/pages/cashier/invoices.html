@@ -1,0 +1,170 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Hoá đơn - Thu ngân</title>
+</head>
+<div layout:fragment="content">
+    <form method="get" class="row g-3 mb-4" th:action="@{/cashier/invoices}">
+        <div class="col-md-6">
+            <input type="text" class="form-control" name="keyword"
+                   placeholder="Tìm theo bàn hoặc nhân viên..." th:value="${keyword}">
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" name="status">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="paid" th:selected="${status == 'paid'}">Đã thanh toán</option>
+                <option value="unpaid" th:selected="${status == 'unpaid'}">Chưa thanh toán</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+        </div>
+    </form>
+
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle table-striped shadow-sm rounded bg-white text-center">
+            <thead class="table-dark text-center">
+            <tr>
+                <th>STT</th>
+                <th>Bàn</th>
+                <th>Nhân viên</th>
+                <th>Thời gian vào bàn</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="invoice, iterStat : ${invoices}">
+                <td th:text="${iterStat.count}"></td>
+                <td th:text="${invoice.tableName}"></td>
+                <td th:text="${invoice.employeeName}"></td>
+                <td th:text="${#temporals.format(invoice.orderTime, 'dd/MM/yyyy HH:mm')}"></td>
+                <td>
+                    <span th:if="${invoice.paid}" class="badge bg-success">Đã thanh toán</span>
+                    <span th:if="${!invoice.paid}" class="badge bg-warning text-dark">Chưa thanh toán</span>
+                </td>
+                <td class="d-flex flex-column flex-md-row gap-2 justify-content-center">
+                    <a class="btn btn-outline-primary btn-sm" title="Xem chi tiết" data-bs-title="Xem chi tiết"
+                       th:href="@{'/cashier/' + ${invoice.id}+'/invoice'}">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <th:block>
+                        <button class="btn btn-success btn-sm"
+                                data-bs-toggle="modal" title="Thanh toán" data-bs-title="Thanh toán"
+                                th:attr="data-bs-target='#checkoutModal__' + ${invoice.id}"
+                                th:classappend="${invoice.paid ? 'disabled' : ''}">
+                            <i class="bi bi-cash-coin"></i>
+                        </button>
+                        <div class="modal fade" th:id="'checkoutModal__' + ${invoice.id}" tabindex="-1"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form th:action="@{'/cashier/invoices/' + ${invoice.id} + '/checkout'}"
+                                          th:object="${newPayment}" method="post">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Thanh toán hóa đơn bàn: <span
+                                                    th:text="${invoice.tableName}"></span></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Đóng"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="hidden" th:name="invoiceId" th:value="${invoice.id}"/>
+                                            <div class="mb-3">
+                                                <label class="form-label">Phương thức thanh toán</label>
+                                                <select class="form-select" name="method" required>
+                                                    <option value="">-- Chọn phương thức --</option>
+                                                    <option value="CASH">Tiền mặt</option>
+                                                    <option value="TRANSFER">Chuyển khoản</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Số tiền thanh toán</label>
+                                                <input type="number" class="form-control" name="amount"
+                                                       th:value="${invoice.totalAmount}">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                    data-bs-dismiss="modal">Hủy
+                                            </button>
+                                            <button type="submit" class="btn btn-success">Xác nhận thanh toán
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Không có hóa đơn -->
+    <div th:if="${#lists.isEmpty(invoices)}" class="text-center mt-5">
+        <p class="text-muted">Không có bàn nào đang chờ thanh toán.</p>
+    </div>
+    <nav th:if="${totalPages > 1}" aria-label="Pagination">
+        <ul class="pagination justify-content-center mt-4">
+            <!-- Trước -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{|/cashier/invoices?page=${currentPage - 1}&keyword=${keyword}&status=${status}|}">
+                    <i class="bi bi-chevron-left"></i> Trước
+                </a>
+            </li>
+
+            <!-- Trang đầu -->
+            <li class="page-item" th:if="${currentPage > 2}">
+                <a class="page-link"
+                   th:href="@{|/cashier/invoices?page=0&keyword=${keyword}&status=${status}|}">1</a>
+            </li>
+
+            <!-- ... trước -->
+            <li class="page-item disabled" th:if="${currentPage > 3}">
+                <span class="page-link">...</span>
+            </li>
+
+            <!-- Trang gần current -->
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2),
+                                             T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{|/cashier/invoices?page=${i}&keyword=${keyword}&status=${status}|}"
+                   th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- ... sau -->
+            <li class="page-item disabled" th:if="${currentPage < totalPages - 3}">
+                <span class="page-link">...</span>
+            </li>
+
+            <!-- Trang cuối -->
+            <li class="page-item" th:if="${currentPage < totalPages - 2}">
+                <a class="page-link"
+                   th:href="@{|/cashier/invoices?page=${totalPages - 1}&keyword=${keyword}&status=${status}|}"
+                   th:text="${totalPages}">Cuối</a>
+            </li>
+
+            <!-- Sau -->
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{|/cashier/invoices?page=${currentPage + 1}&keyword=${keyword}&status=${status}|}">
+                    Sau <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+<th:block layout:fragment="modal">
+</th:block>
+
+<th:block layout:fragment="script">
+
+</th:block>
+</html>

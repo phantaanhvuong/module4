@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --accent-color: #00c8b3;
+            --body-bg-color: #e4e9f2;
+            --body-text-color: #333;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            background-color: var(--body-bg-color);
+            color: var(--body-text-color);
+            min-height: 100vh;
+        }
+        #notification-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar .btn-outline-secondary {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .navbar .btn-outline-secondary:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        footer {
+            font-size: 0.875rem;
+            background-color: #f1f3f5;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+    <style>
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #495057, #6c757d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #343a40;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm px-3">
+        <div class="container-fluid">
+            <div>
+                <img th:src="@{'/img/logo.png'}" alt="Logo" width="100%" style="max-width: 106px; filter: drop-shadow(2px 4px 6px black);">
+            </div>
+            <div class="flex-grow-1"></div>
+            <div th:replace="~{fragments/shared/notification :: notification}"></div>
+            <div th:replace="~{fragments/shared/user_action :: userAction}"></div>
+        </div>
+    </nav>
+
+    <main class="p-4 flex-grow-1">
+        <div layout:fragment="content"></div>
+    </main>
+
+    <footer class="border-top">&copy; 2025 Hệ thống POS nhà hàng</footer>
+</div>
+
+<div th:replace="~{fragments/shared/profile_modal :: profileModal}"></div>
+
+<div id="toast-noti-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
+<audio id="notificationSound" src="https://www.myinstants.com/media/sounds/notification_o14egLP.mp3"></audio>
+
+<th:block layout:fragment="modal"></th:block>
+
+<!-- SCRIPTS -->
+<th:block th:replace="~{fragments/shared/script :: script}"></th:block>
+
+<th:block layout:fragment="script"></th:block>
+</body>
+</html>

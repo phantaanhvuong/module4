@@ -1,0 +1,84 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Danh mục món - Quản lý</title>
+</head>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <a class="btn btn-success shadow-sm" th:href="@{/manager/menu_category/save}">
+            <i class="bi bi-plus-lg"></i> Thêm mới
+        </a>
+        <div class="d-flex gap-2 align-items-center">
+            <!-- Nút thêm mới bên trái -->
+
+
+        </div>
+    </div>
+
+    <!-- Nút Thùng rác nằm xuống dưới bên phải -->
+    <div class="d-flex justify-content-end mb-3">
+        <a class="btn btn-danger" th:href="@{/manager/menu_category/trash}">
+            <i class="bi bi-trash"></i>
+            Thùng rác
+            <span th:if="${trashCount > 0}">(<span th:text="${trashCount}">1</span>)</span>
+        </a>
+    </div>
+
+
+    <table class="table table-hover table-striped shadow-sm rounded bg-white">
+        <thead class="table-dark text-center">
+        <tr>
+            <th>STT</th>
+            <th>Tên</th>
+           <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody class="align-middle text-center">
+        <tr th:each="category, status : ${menuCategories}">
+            <td th:text="${status.count}"></td>
+            <td th:text="${category.name}"></td>
+            <td><a th:href="@{/manager/menu_category/{id}/edit(id=${category.id})}"
+                   class="btn btn-outline-primary btn-sm me-1"
+                   data-bs-toggle="tooltip"
+                   title="Sửa"
+                   th:attr="data-bs-title='Sửa danh mục ' + ${category.name}">
+                <i class="bi bi-pencil-square"></i>
+            </a>
+
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        title="Xoá"
+                        th:attr="data-id=${category.id}, data-title=${category.name}, data-bs-title='Xóa danh mục ' + ${category.name}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<th:block layout:fragment="modal">
+    <div th:replace="~{fragments/shared/delete_modal :: deleteModal ('danh mục món')}"></div>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+                deleteModal.querySelector('#modalTitle').textContent = title;
+                deleteModal.querySelector('#deleteForm').setAttribute('action', '/manager/menu_category/' + id + '/delete');
+            });
+        });
+    </script>
+</th:block>
+</html>
+
+
+

@@ -1,0 +1,534 @@
+<html layout:decorate="~{layouts/no-sidebar-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Đơn hàng - Bếp</title>
+    <style>
+        .order-card {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge-status {
+            font-size: 0.9rem;
+        }
+
+        .list-group-item-new {
+            background-color: white;
+        }
+
+        .list-group-item-cooking {
+            background-color: gold;
+        }
+
+        .list-group-item-ready {
+            background-color: springgreen;
+        }
+
+        .list-group-item-served {
+            background-color: #e2e3e5;
+        }
+
+        .item-canceled {
+            background-color: #f8d7da !important; /* nền đỏ nhạt */
+            color: #842029 !important; /* chữ đỏ đậm */
+            font-style: italic;
+        }
+
+        .btn-cancel {
+            color: #842029;
+            border: 1px solid #842029;
+            background-color: #f8d7da;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e58d96;
+            color: white;
+            border-color: #842029;
+        }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+</head>
+<div layout:fragment="content">
+    <h2 class="mb-4">Món cần chế biến</h2>
+    <div th:if="${undoItemId != null}" class="alert alert-info alert-dismissible fade show" role="alert" id="undoAlert">
+        Đã thay đổi trạng thái món.
+        <form th:action="@{'/kitchen/dashboard/item/' + ${undoItemId} + '/undo'}" method="post" style="display:inline;">
+            <input type="hidden" name="status" th:value="${undoOldStatus}"/>
+            <input type="hidden" name="filter" th:value="${undoFilter}"/>
+            <input type="hidden" name="date" th:value="${undoDate}"/>
+            <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Hoàn tác</button>
+        </form>
+    </div>
+
+    <form class="mb-3 d-flex align-items-center gap-2" method="get" th:action="@{/kitchen/dashboard}">
+        <input type="hidden" name="filter" th:value="${currentFilter}"/>
+        <label for="date" class="form-label mb-0">Ngày:</label>
+        <input type="date" id="date" name="date"
+               th:value="${selectedDate}" class="form-control" style="max-width: 200px;" onchange="this.form.submit()"/>
+
+    </form>
+
+
+    <!-- Tabs lọc trạng thái -->
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'ALL'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='ALL', date=${currentDate})}">
+                Tất cả
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'NEW'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='NEW', date=${currentDate})}">
+                Chưa bắt đầu
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'COOKING'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='COOKING', date=${currentDate})}">
+                Đang chế biến
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'READY'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='READY', date=${currentDate})}">
+                Đã sẵn sàng
+            </a>
+        </li>
+    </ul>
+    <!-- Giao diện các nhóm đơn hàng -->
+    <div class="row" id="order-container">
+        <div class="order-item-container col-12 col-md-6 mb-4" th:each="group : ${groupedOrders}" th:if="${group.hasUnservedItems()}">
+            <div class="order-card bg-white d-flex flex-column justify-content-between">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <strong th:text="'Bàn ' + ${group.tableName}">Bàn 01</strong> |
+                        <small th:text="${#temporals.format(group.createdAt, 'HH:mm dd/MM/yyyy')}">12:00</small>
+                    </div>
+                </div>
+
+                <!-- Danh sách món -->
+                <ul class="list-group">
+                    <li class="list-group-item"
+                        th:each="item : ${group.orderItems}"
+                        th:if="${item.deleted == false}"
+                        th:classappend="'list-group-item-' + ${item.status.name().toLowerCase()} + (${item.status.name() == 'CANCELED'} ? ' item-canceled' : '')"
+                        th:attr="data-item-id=${item.id}">
+
+
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>
+                                    <span th:text="${item.menuItem.name}"></span>
+                                    <span th:if="${item.status.name() == 'CANCELED'}">(Đã huỷ)</span>
+                                </strong>
+
+                                <span class="badge bg-primary rounded-pill" th:text="'x' + ${item.quantity}">x1</span>
+                            </div>
+                            <div>
+                                <form onsubmit="return false;">
+                                    <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}"
+                                           value="COOKING"/>
+                                    <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}"
+                                           value="READY"/>
+                                    <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}"
+                                           value="SERVED"/>
+
+                                    <button type="button" th:if="${item.status.name() == 'NEW'}"
+                                            class="btn btn-outline-warning btn-sm"
+                                            th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'COOKING\')'">Bắt đầu
+                                    </button>
+
+                                    <button type="button" th:if="${item.status.name() == 'COOKING'}"
+                                            class="btn btn-outline-success btn-sm"
+                                            th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'READY\')'">Sẵn sàng
+                                    </button>
+
+                                    <button type="button" th:if="${item.status.name() == 'READY'}"
+                                            class="btn btn-success btn-sm"
+                                            th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'SERVED\')'">Đang phục vụ
+                                    </button>
+                                </form>
+
+
+                                <button type="button"
+                                        th:if="${item.deleted == false and item.status.name() == 'CANCELED'}"
+                                        class="btn btn-cancel btn-sm"
+                                        th:attr="onclick=|hideCanceledItem(${item.id})|">
+                                    Ẩn
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="modal">
+    <audio id="notifySound" src="https://www.myinstants.com/media/sounds/bell-notification.mp3" preload="auto"></audio>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script>
+        function playNotify() {
+            document.getElementById("notifySound").play();
+        }
+
+        setTimeout(() => {
+            const alert = document.getElementById("undoAlert");
+            if (alert) {
+                alert.classList.remove("show");
+                alert.classList.add("hide");
+            }
+        }, 3000);
+    </script>
+    <script>
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            stompClient.subscribe(`/topic/user.${empId}`, function (message) {
+                let data = JSON.parse(message.body);
+                console.log("📩 Notification nhận:", data);
+                if (data.newOrder) {
+                    appendNewOrderToDOM(data);
+                } else {
+                    const item = data.orderItem;
+                    if (item && item.status === "CANCELED") {
+                        updateCanceledItem(item);
+                    } else if (item.status === "SERVED") {
+                        updateServedItem(item);
+                    }
+                }
+            });
+        });
+
+        function appendNewOrderToDOM(data) {
+            const container = document.getElementById("order-container");
+            const order = data.order;
+            const tableName = order.table.name;
+            const createdAt = new Date(order.createdAt);
+
+            // Tạo cột ngoài
+            const col = document.createElement("div");
+            col.className = "order-item-container col-12 col-md-6 mb-4";
+
+            // Tạo thẻ card
+            const card = document.createElement("div");
+            card.className = "order-card bg-white d-flex flex-column justify-content-between";
+
+            // Phần header
+            const headerDiv = document.createElement("div");
+            headerDiv.className = "d-flex justify-content-between align-items-center mb-2";
+
+            const infoDiv = document.createElement("div");
+            const strong = document.createElement("strong");
+            strong.textContent = tableName;
+
+            const small = document.createElement("small");
+            small.textContent = createdAt.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + " " +
+                createdAt.toLocaleDateString("vi-VN");
+
+            infoDiv.appendChild(strong);
+            infoDiv.appendChild(document.createTextNode(" | "));
+            infoDiv.appendChild(small);
+            headerDiv.appendChild(infoDiv);
+            card.appendChild(headerDiv);
+
+            // Danh sách món
+            const ul = document.createElement("ul");
+            ul.className = "list-group";
+
+            data.orderItems.forEach(item => {
+                const li = document.createElement("li");
+                li.className = `list-group-item list-group-item-${item.status.toLowerCase()}`;
+                if (item.status === "CANCELED") {
+                    li.classList.add("item-canceled");
+                }
+                li.setAttribute("data-item-id", item.id);
+
+                const contentDiv = document.createElement("div");
+                contentDiv.className = "d-flex justify-content-between align-items-center";
+
+                const leftDiv = document.createElement("div");
+                const itemName = document.createElement("strong");
+                itemName.textContent = item.menuItem.name;
+                if (item.status === "CANCELED") {
+                    itemName.textContent += " (Đã huỷ)";
+                }
+
+                const badge = document.createElement("span");
+                badge.className = "badge bg-primary rounded-pill";
+                badge.textContent = "x" + item.quantity;
+
+                leftDiv.appendChild(itemName);
+                leftDiv.appendChild(document.createTextNode(" "));
+                leftDiv.appendChild(badge);
+
+                const rightDiv = document.createElement("div");
+                const button = createStatusButton(item.status, item.id);
+                if (button) rightDiv.appendChild(button);
+
+                contentDiv.appendChild(leftDiv);
+                contentDiv.appendChild(rightDiv);
+
+                li.appendChild(contentDiv);
+                ul.appendChild(li);
+            });
+
+            card.appendChild(ul);
+            col.appendChild(card);
+            container.appendChild(col);
+        }
+
+
+        function createStatusButton(status, itemId) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "btn btn-sm";
+
+            if (status === "NEW") {
+                button.textContent = "Bắt đầu";
+                button.classList.add("btn-outline-warning");
+                button.onclick = () => updateItemStatus(itemId, 'COOKING');
+            } else if (status === "COOKING") {
+                button.textContent = "Sẵn sàng";
+                button.classList.add("btn-outline-success");
+                button.onclick = () => updateItemStatus(itemId, 'READY');
+            } else if (status === "READY") {
+                button.textContent = "Đang phục vụ";
+                button.classList.add("btn-success");
+                button.onclick = () => updateItemStatus(itemId, 'SERVED');
+            } else {
+                return null; // Không tạo button cho trạng thái khác
+            }
+
+            return button;
+        }
+
+        function updateCanceledItem(orderItem) {
+            const itemId = orderItem.id;
+            const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+
+            if (!listItem) {
+                console.warn(`Item ${itemId} not found in DOM.`);
+                return;
+            }
+
+            // 1. Cập nhật class trạng thái
+            listItem.classList.remove(
+                "list-group-item-new",
+                "list-group-item-cooking",
+                "list-group-item-ready",
+                "list-group-item-served"
+            );
+            listItem.classList.add("list-group-item-canceled", "item-canceled");
+
+            // 2. Cập nhật nội dung món ăn với (Đã huỷ)
+            const strongEl = listItem.querySelector("strong");
+            if (strongEl && !strongEl.textContent.includes("(Đã huỷ)")) {
+                strongEl.textContent += " (Đã huỷ)";
+            }
+
+            // 3. Xóa nút thao tác nếu có
+            const buttonContainer = listItem.querySelector('.d-flex > div:last-child');
+            if (buttonContainer) {
+                buttonContainer.innerHTML = '';
+            }
+
+            // 4. Thêm nút "Ẩn" (nếu chưa có)
+            const hideBtnId = `hide-btn-${itemId}`;
+            if (!document.getElementById(hideBtnId)) {
+                const hideButton = document.createElement("button");
+                hideButton.id = hideBtnId;
+                hideButton.className = "btn btn-cancel btn-sm";
+                hideButton.textContent = "Ẩn";
+                hideButton.onclick = () => hideCanceledItem(itemId);
+                buttonContainer?.appendChild(hideButton);
+            }
+            removeContainerIfNoPendingItems(listItem);
+        }
+
+        function hideCanceledItem(itemId) {
+            const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+            if (listItem) {
+                listItem.remove(); // Ẩn luôn khỏi giao diện
+            }
+
+            // Nếu cần gửi request về server:
+            fetch("/kitchen/hide/orderItem", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    orderId: itemId,
+                    date: new Date().toISOString().slice(0, 10),
+                    filter: 'ALL'
+                })
+            }).then(() => {
+                console.log("Đã ẩn món đã huỷ:", itemId);
+            }).catch(console.error);
+        }
+
+        function updateServedItem(orderItem) {
+            const itemId = orderItem.id;
+            const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+
+            if (!listItem) {
+                console.warn(`Item ${itemId} not found in DOM.`);
+                return;
+            }
+
+            // 1. Cập nhật class trạng thái
+            listItem.classList.remove(
+                "list-group-item-new",
+                "list-group-item-cooking",
+                "list-group-item-ready",
+                "list-group-item-canceled"
+            );
+            listItem.classList.add("list-group-item-served");
+
+            // 2. Cập nhật số lượng (badge)
+            const badge = listItem.querySelector(".badge");
+            if (badge) {
+                badge.textContent = `x${orderItem.quantity}`;
+            }
+
+            // 3. Xoá nút thao tác
+            const buttonContainer = listItem.querySelector('.d-flex > div:last-child');
+            if (buttonContainer) {
+                buttonContainer.innerHTML = ''; // Ẩn nút sau khi phục vụ
+            }
+            removeContainerIfNoPendingItems(listItem);
+        }
+
+        function removeContainerIfNoPendingItems(listItemElement) {
+            const container = listItemElement.closest(".order-item-container");
+            if (!container) return;
+
+            const allItems = container.querySelectorAll("li.list-group-item");
+            const hasActiveItems = Array.from(allItems).some(li => {
+                const classList = li.classList;
+                return (
+                    classList.contains("list-group-item-new") ||
+                    classList.contains("list-group-item-cooking") ||
+                    classList.contains("list-group-item-ready")
+                );
+            });
+
+            if (!hasActiveItems) {
+                container.remove();
+                console.log("🗑️ Đã xoá container vì tất cả món đã huỷ hoặc phục vụ.");
+            }
+        }
+
+
+
+    </script>
+    <script>
+        function updateItemStatus(itemId, newStatus) {
+            fetch(`/kitchen/dashboard/item/${itemId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({status: newStatus})
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Update failed");
+                    return response.text(); // nếu backend không trả JSON
+                })
+                .then(() => {
+                    console.log(`✅ Cập nhật item ${itemId} → ${newStatus}`);
+
+                    const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+                    if (!listItem) return;
+
+                    // 1. Cập nhật class trạng thái
+                    listItem.classList.remove(
+                        'list-group-item-new',
+                        'list-group-item-cooking',
+                        'list-group-item-ready',
+                        'list-group-item-served',
+                        'list-group-item-canceled'
+                    );
+
+                    const statusClass = `list-group-item-${newStatus.toLowerCase()}`;
+                    listItem.classList.add(statusClass);
+
+                    // 2. Cập nhật nút thao tác
+                    const buttonContainer = listItem.querySelector('.d-flex > div:last-child');
+                    if (buttonContainer) {
+                        let nextStatus = null;
+                        let buttonText = "";
+                        let buttonClass = "";
+
+                        if (newStatus === 'NEW') {
+                            nextStatus = 'COOKING';
+                            buttonText = 'Bắt đầu';
+                            buttonClass = 'btn-outline-warning';
+                        } else if (newStatus === 'COOKING') {
+                            nextStatus = 'READY';
+                            buttonText = 'Sẵn sàng';
+                            buttonClass = 'btn-outline-success';
+                        } else if (newStatus === 'READY') {
+                            nextStatus = 'SERVED';
+                            buttonText = 'Đang phục vụ';
+                            buttonClass = 'btn-success';
+                        }
+
+                        if (nextStatus) {
+                            buttonContainer.innerHTML = `
+                        <button class="btn ${buttonClass} btn-sm" onclick="updateItemStatus(${itemId}, '${nextStatus}')">
+                            ${buttonText}
+                        </button>
+                    `;
+                        } else {
+                            // Nếu là trạng thái cuối cùng SERVED → ẩn luôn nút
+                            buttonContainer.innerHTML = "";
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error(`❌ Lỗi khi cập nhật trạng thái item ${itemId}:`, error);
+                });
+        }
+
+
+        function showUndoAlert(itemId, oldStatus) {
+            const undoDiv = document.createElement("div");
+            undoDiv.className = "alert alert-info alert-dismissible fade show";
+            undoDiv.setAttribute("role", "alert");
+            undoDiv.innerHTML = `
+        Đã thay đổi trạng thái món.
+        <form method="post" action="/kitchen/dashboard/item/${itemId}/undo" style="display:inline;">
+            <input type="hidden" name="status" value="${oldStatus}">
+            <input type="hidden" name="date" value="${new Date().toISOString().split("T")[0]}">
+            <input type="hidden" name="filter" value="ALL">
+            <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Hoàn tác</button>
+        </form>
+    `;
+
+            const contentDiv = document.querySelector("div[layout\\:fragment='content']");
+            contentDiv.insertBefore(undoDiv, contentDiv.firstChild);
+
+            setTimeout(() => {
+                undoDiv.classList.remove("show");
+                undoDiv.classList.add("hide");
+            }, 3000);
+        }
+
+
+    </script>
+
+</th:block>
+</html>
